@@ -36,6 +36,7 @@ public class PlayerController : MonoBehaviour, IBeatListener {
 	// Use this for initialization
 	void Start () {
         beatSource.AddBeatListener(this);
+        GetComponent<Animator>().speed = (float)beatSource.audioBpm / 60;
 	    destination = transform.position;	
 	}
 
@@ -60,9 +61,11 @@ public class PlayerController : MonoBehaviour, IBeatListener {
                     switch (action.grade)
                     {
                         case BeatSource.Grade.PERFECT:
+                            GetComponent<SpriteRenderer>().flipX = true;
                             destination.x -= Globals.meshSize;
                             break;
                         case BeatSource.Grade.GOOD:
+                            GetComponent<SpriteRenderer>().flipX = true;
                             destination.x -= Globals.meshSize;
                             break;
                     }
@@ -71,9 +74,11 @@ public class PlayerController : MonoBehaviour, IBeatListener {
                     switch (action.grade)
                     {
                         case BeatSource.Grade.PERFECT:
+                            GetComponent<SpriteRenderer>().flipX = false;
                             destination.x += Globals.meshSize;
                             break;
                         case BeatSource.Grade.GOOD:
+                            GetComponent<SpriteRenderer>().flipX = false;
                             destination.x += Globals.meshSize;
                             break;
                     }
@@ -84,11 +89,11 @@ public class PlayerController : MonoBehaviour, IBeatListener {
                         switch (action.grade)
                         {
                             case BeatSource.Grade.PERFECT:
-                                destination.y += Globals.meshSize;
+                                destination.y += 3 * Globals.meshSize;
                                 canfall = false;
                                 break;
                             case BeatSource.Grade.GOOD:
-                                destination.y += Globals.meshSize;
+                                destination.y += 3 * Globals.meshSize;
                                 canfall = false;
                                 break;
                         }
@@ -119,43 +124,6 @@ public class PlayerController : MonoBehaviour, IBeatListener {
 	    if (!HasArrived())
         {
             transform.position = Vector3.MoveTowards(transform.position, destination, speed * Time.deltaTime);
-        }
-
-
-        return;
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            BeatSource.Grade grade = beatSource.getCurrentGrade();
-            judge.UpdateJudge(grade);
-            if (grade == BeatSource.Grade.PERFECT)
-            {
-                destination = transform.position;
-                destination.x -= Globals.meshSize * 2;
-            }
-            else if (grade == BeatSource.Grade.GOOD)
-            {
-                destination = transform.position;
-                destination.x -= Globals.meshSize;
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.D))
-        {
-            BeatSource.Grade grade = beatSource.getCurrentGrade();
-            judge.UpdateJudge(grade);
-            if (grade == BeatSource.Grade.PERFECT)
-            {
-                destination = transform.position;
-                destination.x += Globals.meshSize * 2;
-            }
-            else if (grade == BeatSource.Grade.GOOD)
-            {
-                destination = transform.position;
-                destination.x += Globals.meshSize;
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.W) && isGrounded)
-        {
-            destination.y += Globals.meshSize;
         }
 	}
 

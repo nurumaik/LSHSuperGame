@@ -78,7 +78,7 @@ public class BeatSource : MonoBehaviour {
     void Start () {
         audio.Play();
         //audio.PlayDelayed(0.05f);
-        audioStart = AudioSettings.dspTime - 0.18 /* hack for current track, should be different*/;
+        audioStart = AudioSettings.dspTime - 0.08 /* hack for current track, should be different*/;
         secondsPerBeat = 60.0 / audioBpm;
 	}
 	
