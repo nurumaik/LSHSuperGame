@@ -17,20 +17,23 @@ public class BeatSource : MonoBehaviour {
 
     private double audioStart;
     private double secondsPerBeat;
+    private LinkedList<IBeatListener> beatListeners = new LinkedList<IBeatListener>();
+    private int lastBeat = 0;
 
     private double getOffset(double timePoint)
     {
         double beats = timePoint / secondsPerBeat;
-        double left = Math.Floor(beats) * secondsPerBeat;
+        //double left = Math.Floor(beats) * secondsPerBeat;
         double right = Math.Ceiling(beats) * secondsPerBeat;
-        if (timePoint - left < right - timePoint)
+        return right - timePoint;
+        /*if (timePoint - left < right - timePoint)
         {
             return left - timePoint;
         }
         else
         {
             return right - timePoint;
-        }
+        }*/
     }
 
     private double songTime { get { return AudioSettings.dspTime - audioStart; } }
@@ -38,6 +41,11 @@ public class BeatSource : MonoBehaviour {
     private double getCurrentOffset()
     {
         return getOffset(songTime);
+    }
+
+    public int getCurrentBeat()
+    {
+        return Mathf.FloorToInt((float) (songTime / secondsPerBeat));
     }
 
     public double getBeatPercent()
@@ -50,11 +58,11 @@ public class BeatSource : MonoBehaviour {
     {
         double off = Math.Abs(getCurrentOffset());
         Grade res;
-        if (off < 0.06f)
+        if (off < 0.12f) //0.15 for casual
         {
             res = Grade.PERFECT;
         }
-        else if (off < 0.15f)
+        else if (off < 0.24f) //0.3 for casual
         {
             res = Grade.GOOD;
         }
@@ -70,7 +78,7 @@ public class BeatSource : MonoBehaviour {
     void Start () {
         audio.Play();
         //audio.PlayDelayed(0.05f);
-        audioStart = AudioSettings.dspTime - 0.18;
+        audioStart = AudioSettings.dspTime - 0.18 /* hack for current track, should be different*/;
         secondsPerBeat = 60.0 / audioBpm;
 	}
 	
@@ -78,9 +86,25 @@ public class BeatSource : MonoBehaviour {
 	void Update () {
         //if (Input.GetKeyDown(KeyCode.Space))
         //    Debug.Log(offset(AudioSettings.dspTime - audioStart));
-        float beat = (float)getBeatPercent();
-        beatIndicator.transform.localScale = new Vector3(beat, beat, 1);
+        float beatPercent = (float)getBeatPercent();
+        beatIndicator.transform.localScale = new Vector3(beatPercent, beatPercent, 1);
+        int beat = getCurrentBeat();    
+        if (beat > lastBeat)
+        {
+            lastBeat = beat;
+            UpdateBeats();
+        }
 	}
+
+    void UpdateBeats()
+    {
+        foreach (var listener in beatListeners)
+        {
+            listener.BeatUpdate();
+        }
+    }
+
+    //This should be used for perfect precision
 
     void OnGUI()
     {
@@ -103,5 +127,10 @@ public class BeatSource : MonoBehaviour {
 
     void FixedUpdate()
     {
+    }
+
+    public void AddBeatListener(IBeatListener listener)
+    {
+        beatListeners.AddLast(listener);
     }
 }
