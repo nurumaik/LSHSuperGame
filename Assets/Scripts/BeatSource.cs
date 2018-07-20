@@ -14,6 +14,7 @@ public class BeatSource : MonoBehaviour {
     public AudioSource audio;
     public int audioBpm;
     public Transform beatIndicator;
+    public float offset;
 
     private double audioStart;
     private double secondsPerBeat;
@@ -23,17 +24,8 @@ public class BeatSource : MonoBehaviour {
     private double getOffset(double timePoint)
     {
         double beats = timePoint / secondsPerBeat;
-        //double left = Math.Floor(beats) * secondsPerBeat;
         double right = Math.Ceiling(beats) * secondsPerBeat;
         return right - timePoint;
-        /*if (timePoint - left < right - timePoint)
-        {
-            return left - timePoint;
-        }
-        else
-        {
-            return right - timePoint;
-        }*/
     }
 
     private double songTime { get { return AudioSettings.dspTime - audioStart; } }
@@ -78,7 +70,7 @@ public class BeatSource : MonoBehaviour {
     void Start () {
         audio.Play();
         //audio.PlayDelayed(0.05f);
-        audioStart = AudioSettings.dspTime - 0.08 /* hack for current track, should be different*/;
+        audioStart = AudioSettings.dspTime - offset;
         secondsPerBeat = 60.0 / audioBpm;
 	}
 	
